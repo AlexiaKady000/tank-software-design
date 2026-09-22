@@ -1,12 +1,10 @@
-package ru.mipt.bit.platformer.model;
+package ru.mipt.bit.platformer.model.test;
 
 import com.badlogic.gdx.math.GridPoint2;
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DirectionTest {
-
     @Test
     void shouldMoveUp() {
         GridPoint2 result = Direction.UP.move(new GridPoint2(1, 1));
