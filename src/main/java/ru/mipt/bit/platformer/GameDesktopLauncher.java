@@ -4,23 +4,19 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.MapRenderer;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Rectangle;
-import ru.mipt.bit.platformer.util.TileMovement;
+import ru.mipt.bit.platformer.graphics.FieldGraphics;
+import ru.mipt.bit.platformer.graphics.TankGraphics;
+import ru.mipt.bit.platformer.graphics.TreeGraphics;
+import ru.mipt.bit.platformer.input.InputController;
+import ru.mipt.bit.platformer.input.MoveInputHandler;
+import ru.mipt.bit.platformer.model.Field;
+import ru.mipt.bit.platformer.model.Tank;
+import ru.mipt.bit.platformer.model.Tree;
 
-import static com.badlogic.gdx.Input.Keys.*;
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
-import static com.badlogic.gdx.math.MathUtils.isEqual;
-import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 
 public class GameDesktopLauncher implements ApplicationListener {
     private Batch batch;
@@ -28,49 +24,38 @@ public class GameDesktopLauncher implements ApplicationListener {
     private Tank tank;
     private Tree tree;
 
+    private FieldGraphics fieldGraphics;
+    private TankGraphics tankGraphics;
+    private TreeGraphics treeGraphics;
+    private InputController inputController;
+
     @Override
     public void create() {
         batch = new SpriteBatch();
-        // load level
-        field = new Field(batch);
-        // create player tank and set its initial position
-        tank = new Tank("images/tank_blue.png", new GridPoint2(1, 1));
-        field.placeTank(tank);
-        // create tree obstacle
-        tree = new Tree("images/greenTree.png", new GridPoint2(1, 3));
+        field = new Field(10, 8);
+        tank = new Tank(new GridPoint2(1, 1));
+        tree = new Tree(new GridPoint2(1, 3));
         field.addTree(tree);
+        fieldGraphics = new FieldGraphics(batch);
+        tankGraphics = new TankGraphics(tank);
+        treeGraphics = new TreeGraphics(tree, fieldGraphics.getGroundLayer());
+        inputController = new InputController();
+        inputController.addHandler(new MoveInputHandler(tank, field));
     }
 
     @Override
     public void render() {
-        // clear the screen
         Gdx.gl.glClearColor(0f, 0f, 0.2f, 1f);
         Gdx.gl.glClear(GL_COLOR_BUFFER_BIT);
-        // get time passed since the last render
         float deltaTime = Gdx.graphics.getDeltaTime();
-        // process player input
-        handleInput();
-        // update player position
-        tank.update(deltaTime, field.getTileMovement());
-        // render each tile of the level
-        field.render();
-        // start recording all drawing commands
+        inputController.handleInput();
+        tank.update(deltaTime);
+        tankGraphics.update(fieldGraphics.getTileMovement());
+        fieldGraphics.render();
         batch.begin();
-        // render player
-        tank.render(batch);
-        // render tree obstacle
-        tree.render(batch);
-        // submit all drawing requests
+        tankGraphics.render(batch);
+        treeGraphics.render(batch);
         batch.end();
-    }
-
-    private void handleInput() {
-        for (Direction direction : Direction.values()) {
-            if (direction.isPressed()) {
-                tank.move(direction, field);
-                break;
-            }
-        }
     }
 
     @Override
@@ -90,9 +75,9 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     @Override
     public void dispose() {
-        tree.dispose();
-        tank.dispose();
-        field.dispose();
+        treeGraphics.dispose();
+        tankGraphics.dispose();
+        fieldGraphics.dispose();
         batch.dispose();
     }
 

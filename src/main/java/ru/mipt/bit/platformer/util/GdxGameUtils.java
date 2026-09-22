@@ -14,12 +14,12 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.NoSuchElementException;
-import static com.badlogic.gdx.math.MathUtils.clamp;
 
 public final class GdxGameUtils {
 
     private GdxGameUtils() {
     }
+
     public static MapRenderer createSingleLayerMapRenderer(TiledMap tiledMap, Batch batch) {
         TiledMapTileLayer tileLayer = getSingleLayer(tiledMap);
         float viewWidth = tileLayer.getWidth() * tileLayer.getTileWidth();
@@ -60,10 +60,6 @@ public final class GdxGameUtils {
         return new Rectangle()
                 .setWidth(region.getRegionWidth())
                 .setHeight(region.getRegionHeight());
-    }
-
-    public static float continueProgress(float previousProgress, float deltaTime, float speed) {
-        return clamp(previousProgress + deltaTime / speed, 0f, 1f);
     }
 
     private static Vector2 calculateTileCenter(TiledMapTileLayer tileLayer, GridPoint2 tileCoordinates) {
