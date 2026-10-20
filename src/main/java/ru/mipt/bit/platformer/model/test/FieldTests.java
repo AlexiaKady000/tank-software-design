@@ -2,52 +2,42 @@ package ru.mipt.bit.platformer.model.test;
 
 import com.badlogic.gdx.math.GridPoint2;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import ru.mipt.bit.platformer.model.Field;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class TankTest {
+class FieldTest {
     @Test
-    void shouldStartAtInitialCoordinates() {
-        Tank tank = new Tank(new GridPoint2(1, 1));
+    void shouldRejectCellsOutsideField() {
+        Field field = new Field(10, 8);
 
-        assertEquals(new GridPoint2(1, 1), tank.getCoordinates());
-        assertFalse(tank.isMoving());
+        assertFalse(field.canMoveTo(new GridPoint2(-1, 0)));
+        assertFalse(field.canMoveTo(new GridPoint2(0, -1)));
+        assertFalse(field.canMoveTo(new GridPoint2(10, 0)));
+        assertFalse(field.canMoveTo(new GridPoint2(0, 8)));
+        assertTrue(field.canMoveTo(new GridPoint2(9, 7)));
     }
 
     @Test
-    void shouldStartMovingToEmptyCell() {
+    void shouldSupportObstaclesOccupyingSeveralCells() {
         Field field = new Field(10, 8);
-        Tank tank = new Tank(new GridPoint2(1, 1));
+        field.addObstacle(coordinates -> coordinates.y == 3
+                && coordinates.x >= 2 && coordinates.x <= 4);
 
-        tank.move(Direction.UP, field);
-
-        assertTrue(tank.isMoving());
-        assertEquals(new GridPoint2(1, 2), tank.getDestinationCoordinates());
+        assertFalse(field.canMoveTo(new GridPoint2(2, 3)));
+        assertFalse(field.canMoveTo(new GridPoint2(3, 3)));
+        assertFalse(field.canMoveTo(new GridPoint2(4, 3)));
+        assertTrue(field.canMoveTo(new GridPoint2(5, 3)));
+        assertTrue(field.canMoveTo(new GridPoint2(3, 2)));
     }
 
     @Test
-    void shouldNotMoveIntoTree() {
+    void shouldSupportOtherObstacles() {
         Field field = new Field(10, 8);
-        field.addTree(new Tree(new GridPoint2(1, 2)));
+        field.addObstacle(coordinates -> coordinates.equals(new GridPoint2(2, 3)));
 
-        Tank tank = new Tank(new GridPoint2(1, 1));
-
-        tank.move(Direction.UP, field);
-
-        assertFalse(tank.isMoving());
-        assertEquals(new GridPoint2(1, 1), tank.getDestinationCoordinates());
-    }
-
-    @Test
-    void shouldReachDestination() {
-        Field field = new Field(10, 8);
-        Tank tank = new Tank(new GridPoint2(1, 1));
-
-        tank.move(Direction.RIGHT, field);
-        tank.update(0.4f);
-
-        assertEquals(new GridPoint2(2, 1), tank.getCoordinates());
-        assertFalse(tank.isMoving());
+        assertFalse(field.canMoveTo(new GridPoint2(2, 3)));
+        assertTrue(field.canMoveTo(new GridPoint2(3, 3)));
     }
 }

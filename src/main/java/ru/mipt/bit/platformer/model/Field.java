@@ -5,27 +5,28 @@ import com.badlogic.gdx.math.GridPoint2;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Field {
+public class Field implements MovementField {
     private final int width;
     private final int height;
-    private final List<Tree> trees = new ArrayList<>();
+    private final List<Obstacle> obstacles = new ArrayList<>();
 
     public Field(int width, int height) {
         this.width = width;
         this.height = height;
     }
 
-    public void addTree(Tree tree) {
-        trees.add(tree);
+    public void addObstacle(Obstacle obstacle) {
+        obstacles.add(obstacle);
     }
 
+    @Override
     public boolean canMoveTo(GridPoint2 coordinates) {
         if (!isInsideField(coordinates)) {
             return false;
         }
 
-        for (Tree tree : trees) {
-            if (tree.getCoordinates().equals(coordinates)) {
+        for (Obstacle obstacle : obstacles) {
+            if (obstacle.blocks(coordinates)) {
                 return false;
             }
         }

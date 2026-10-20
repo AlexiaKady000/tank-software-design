@@ -1,7 +1,5 @@
-package ru.mipt.bit.platformer;
+package ru.mipt.bit.platformer.model;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.GridPoint2;
 
 public enum Direction {
@@ -14,7 +12,7 @@ public enum Direction {
     private final float rotation;
 
     Direction(int dx, int dy, float rotation) {
-        vector = new GridPoint2(x, y);
+        vector = new GridPoint2(dx, dy);
         this.rotation = rotation;
     }
 

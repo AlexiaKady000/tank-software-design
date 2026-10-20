@@ -2,6 +2,7 @@ package ru.mipt.bit.platformer.model.test;
 
 import com.badlogic.gdx.math.GridPoint2;
 import org.junit.jupiter.api.Test;
+import ru.mipt.bit.platformer.model.Direction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DirectionTest {

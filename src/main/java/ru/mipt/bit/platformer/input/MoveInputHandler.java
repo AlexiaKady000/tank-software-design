@@ -1,35 +1,31 @@
 package ru.mipt.bit.platformer.input;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import ru.mipt.bit.platformer.model.Direction;
-import ru.mipt.bit.platformer.model.Field;
-import ru.mipt.bit.platformer.model.Tank;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.IntPredicate;
 
 public class MoveInputHandler implements InputHandler {
-    private final Tank tank;
-    private final Field field;
+    private final Consumer<Direction> move;
+    private final IntPredicate isKeyPressed;
+    private final Map<Integer, Direction> keyBindings;
 
-    public MoveInputHandler(Tank tank, Field field) {
-        this.tank = tank;
-        this.field = field;
+    public MoveInputHandler(Consumer<Direction> move, IntPredicate isKeyPressed,
+                           Map<Integer, Direction> keyBindings) {
+        this.move = move;
+        this.isKeyPressed = isKeyPressed;
+        this.keyBindings = new LinkedHashMap<>(keyBindings);
     }
 
     @Override
     public void handleInput() {
-        if (isPressed(Input.Keys.UP, Input.Keys.W)) {
-            tank.move(Direction.UP, field);
-        } else if (isPressed(Input.Keys.LEFT, Input.Keys.A)) {
-            tank.move(Direction.LEFT, field);
-        } else if (isPressed(Input.Keys.DOWN, Input.Keys.S)) {
-            tank.move(Direction.DOWN, field);
-        } else if (isPressed(Input.Keys.RIGHT, Input.Keys.D)) {
-            tank.move(Direction.RIGHT, field);
+        for (Map.Entry<Integer, Direction> binding : keyBindings.entrySet()) {
+            if (isKeyPressed.test(binding.getKey())) {
+                move.accept(binding.getValue());
+                return;
+            }
         }
-    }
-
-    private boolean isPressed(int firstKey, int secondKey) {
-        return Gdx.input.isKeyPressed(firstKey)
-                || Gdx.input.isKeyPressed(secondKey);
     }
 }

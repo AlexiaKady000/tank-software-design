@@ -2,45 +2,71 @@ package ru.mipt.bit.platformer;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.utils.Disposable;
 import ru.mipt.bit.platformer.graphics.FieldGraphics;
+import ru.mipt.bit.platformer.graphics.Renderable;
 import ru.mipt.bit.platformer.graphics.TankGraphics;
 import ru.mipt.bit.platformer.graphics.TreeGraphics;
 import ru.mipt.bit.platformer.input.InputController;
 import ru.mipt.bit.platformer.input.MoveInputHandler;
+import ru.mipt.bit.platformer.model.Direction;
 import ru.mipt.bit.platformer.model.Field;
 import ru.mipt.bit.platformer.model.Tank;
 import ru.mipt.bit.platformer.model.Tree;
+import ru.mipt.bit.platformer.model.Updatable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 
 public class GameDesktopLauncher implements ApplicationListener {
     private Batch batch;
-    private Field field;
-    private Tank tank;
-    private Tree tree;
-
     private FieldGraphics fieldGraphics;
-    private TankGraphics tankGraphics;
-    private TreeGraphics treeGraphics;
+    private final List<Updatable> updatables = new ArrayList<>();
+    private final List<Renderable> renderables = new ArrayList<>();
+    private final List<Disposable> disposables = new ArrayList<>();
     private InputController inputController;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
-        field = new Field(10, 8);
-        tank = new Tank(new GridPoint2(1, 1));
-        tree = new Tree(new GridPoint2(1, 3));
-        field.addTree(tree);
-        fieldGraphics = new FieldGraphics(batch);
-        tankGraphics = new TankGraphics(tank);
-        treeGraphics = new TreeGraphics(tree, fieldGraphics.getGroundLayer());
+        Field field = new Field(10, 8);
+        Tank tank = new Tank(new GridPoint2(1, 1), 0.4f);
+        Tree tree = new Tree(new GridPoint2(1, 3));
+        field.addObstacle(tree);
+        fieldGraphics = new FieldGraphics(batch, "level.tmx", Interpolation.smooth);
+        TankGraphics tankGraphics = new TankGraphics(tank, "images/tank_blue.png");
+        TreeGraphics treeGraphics = new TreeGraphics(tree, fieldGraphics.getGroundLayer(), "images/greenTree.png");
+        updatables.add(tank);
+        updatables.add(deltaTime -> tankGraphics.update(fieldGraphics.getTileMovement()));
+        renderables.add(tankGraphics);
+        renderables.add(treeGraphics);
+        disposables.add(treeGraphics);
+        disposables.add(tankGraphics);
+        disposables.add(fieldGraphics);
+        disposables.add(batch);
         inputController = new InputController();
-        inputController.addHandler(new MoveInputHandler(tank, field));
+        Map<Integer, Direction> keyBindings = new LinkedHashMap<>();
+        keyBindings.put(Input.Keys.UP, Direction.UP);
+        keyBindings.put(Input.Keys.W, Direction.UP);
+        keyBindings.put(Input.Keys.LEFT, Direction.LEFT);
+        keyBindings.put(Input.Keys.A, Direction.LEFT);
+        keyBindings.put(Input.Keys.DOWN, Direction.DOWN);
+        keyBindings.put(Input.Keys.S, Direction.DOWN);
+        keyBindings.put(Input.Keys.RIGHT, Direction.RIGHT);
+        keyBindings.put(Input.Keys.D, Direction.RIGHT);
+        inputController.addHandler(new MoveInputHandler(
+                direction -> tank.move(direction, field), Gdx.input::isKeyPressed, keyBindings));
     }
 
     @Override
@@ -49,12 +75,14 @@ public class GameDesktopLauncher implements ApplicationListener {
         Gdx.gl.glClear(GL_COLOR_BUFFER_BIT);
         float deltaTime = Gdx.graphics.getDeltaTime();
         inputController.handleInput();
-        tank.update(deltaTime);
-        tankGraphics.update(fieldGraphics.getTileMovement());
+        for (Updatable updatable : updatables) {
+            updatable.update(deltaTime);
+        }
         fieldGraphics.render();
         batch.begin();
-        tankGraphics.render(batch);
-        treeGraphics.render(batch);
+        for (Renderable renderable : renderables) {
+            renderable.render(batch);
+        }
         batch.end();
     }
 
@@ -75,10 +103,9 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     @Override
     public void dispose() {
-        treeGraphics.dispose();
-        tankGraphics.dispose();
-        fieldGraphics.dispose();
-        batch.dispose();
+        for (Disposable disposable : disposables) {
+            disposable.dispose();
+        }
     }
 
     public static void main(String[] args) {
