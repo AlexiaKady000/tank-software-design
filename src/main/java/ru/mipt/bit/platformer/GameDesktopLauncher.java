@@ -7,7 +7,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Disposable;
 import ru.mipt.bit.platformer.graphics.FieldGraphics;
@@ -16,20 +15,29 @@ import ru.mipt.bit.platformer.graphics.TankGraphics;
 import ru.mipt.bit.platformer.graphics.TreeGraphics;
 import ru.mipt.bit.platformer.input.InputController;
 import ru.mipt.bit.platformer.input.MoveInputHandler;
+import ru.mipt.bit.platformer.level.FileLevelLoader;
+import ru.mipt.bit.platformer.level.Level;
+import ru.mipt.bit.platformer.level.LevelLoader;
+import ru.mipt.bit.platformer.level.RandomLevelLoader;
 import ru.mipt.bit.platformer.model.Direction;
 import ru.mipt.bit.platformer.model.Field;
 import ru.mipt.bit.platformer.model.Tank;
 import ru.mipt.bit.platformer.model.Tree;
 import ru.mipt.bit.platformer.model.Updatable;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Random;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 
 public class GameDesktopLauncher implements ApplicationListener {
+    private final LevelLoader levelLoader;
     private Batch batch;
     private FieldGraphics fieldGraphics;
     private final List<Updatable> updatables = new ArrayList<>();
@@ -37,21 +45,37 @@ public class GameDesktopLauncher implements ApplicationListener {
     private final List<Disposable> disposables = new ArrayList<>();
     private InputController inputController;
 
+    public GameDesktopLauncher() {
+        this(new RandomLevelLoader(10, 8, 20, new Random()));
+    }
+
+    public GameDesktopLauncher(LevelLoader levelLoader) {
+        this.levelLoader = levelLoader;
+    }
+
     @Override
     public void create() {
+        Level level;
+        try {
+            level = levelLoader.load();
+        } catch (IOException e) {
+            throw new UncheckedIOException("Cannot read level", e);
+        }
         batch = new SpriteBatch();
-        Field field = new Field(10, 8);
-        Tank tank = new Tank(new GridPoint2(1, 1), 0.4f);
-        Tree tree = new Tree(new GridPoint2(1, 3));
-        field.addObstacle(tree);
-        fieldGraphics = new FieldGraphics(batch, "level.tmx", Interpolation.smooth);
+        Field field = new Field(level.getWidth(), level.getHeight());
+        Tank tank = new Tank(level.getPlayerCoordinates(), 0.4f);
+        fieldGraphics = new FieldGraphics(batch, "level.tmx", Interpolation.smooth,
+                level.getWidth(), level.getHeight());
         TankGraphics tankGraphics = new TankGraphics(tank, "images/tank_blue.png");
-        TreeGraphics treeGraphics = new TreeGraphics(tree, fieldGraphics.getGroundLayer(), "images/greenTree.png");
         updatables.add(tank);
         updatables.add(deltaTime -> tankGraphics.update(fieldGraphics.getTileMovement()));
         renderables.add(tankGraphics);
-        renderables.add(treeGraphics);
-        disposables.add(treeGraphics);
+        for (Tree tree : level.getTrees()) {
+            field.addObstacle(tree);
+            TreeGraphics treeGraphics = new TreeGraphics(tree, fieldGraphics.getGroundLayer(), "images/greenTree.png");
+            renderables.add(treeGraphics);
+            disposables.add(treeGraphics);
+        }
         disposables.add(tankGraphics);
         disposables.add(fieldGraphics);
         disposables.add(batch);
@@ -108,10 +132,13 @@ public class GameDesktopLauncher implements ApplicationListener {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        LevelLoader loader = args.length == 0
+                ? new RandomLevelLoader(10, 8, 20, new Random())
+                : new FileLevelLoader(Paths.get(args[0]));
+        Level level = loader.load();
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-        // level width: 10 tiles x 128px, height: 8 tiles x 128px
-        config.setWindowedMode(1280, 1024);
-        new Lwjgl3Application(new GameDesktopLauncher(), config);
+        config.setWindowedMode(level.getWidth() * 128, level.getHeight() * 128);
+        new Lwjgl3Application(new GameDesktopLauncher(() -> level), config);
     }
 }
