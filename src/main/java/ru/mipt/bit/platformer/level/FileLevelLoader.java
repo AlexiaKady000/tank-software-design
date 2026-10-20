@@ -24,7 +24,7 @@ public class FileLevelLoader implements LevelLoader {
             rows.set(0, rows.get(0).substring(1));
         }
         if (rows.isEmpty() || rows.get(0).isEmpty()) {
-            throw new IllegalArgumentException("Level must not be empty");
+            throw new IllegalArgumentException("Level mustnt be empty");
         }
         int width = rows.get(0).length();
         int height = rows.size();
@@ -33,7 +33,7 @@ public class FileLevelLoader implements LevelLoader {
         for (int row = 0; row < height; row++) {
             String line = rows.get(row);
             if (line.length() != width) {
-                throw new IllegalArgumentException("Level rows must have equal width");
+                throw new IllegalArgumentException("Level rows must all have equal width");
             }
             for (int x = 0; x < width; x++) {
                 GridPoint2 coordinates = new GridPoint2(x, height - row - 1);
@@ -43,20 +43,20 @@ public class FileLevelLoader implements LevelLoader {
                         break;
                     case 'X':
                         if (playerCoordinates != null) {
-                            throw new IllegalArgumentException("Level must have exactly one player");
+                            throw new IllegalArgumentException("Level must have just one player");
                         }
                         playerCoordinates = coordinates;
                         break;
                     case '_':
                         break;
                     default:
-                        throw new IllegalArgumentException("Unknown level symbol at row "
+                        throw new IllegalArgumentException("Unknown symbol at row "
                                 + (row + 1) + ", column " + (x + 1));
                 }
             }
         }
         if (playerCoordinates == null) {
-            throw new IllegalArgumentException("Level must have exactly one player");
+            throw new IllegalArgumentException("Level must have just one player");
         }
         return new Level(width, height, playerCoordinates, trees);
     }

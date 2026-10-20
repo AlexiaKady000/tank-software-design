@@ -15,7 +15,7 @@ public class Level {
 
     public Level(int width, int height, GridPoint2 playerCoordinates, List<Tree> trees) {
         if (width <= 0 || height <= 0) {
-            throw new IllegalArgumentException("Level dimensions must be positive");
+            throw new IllegalArgumentException("Level dimensions num must be positive");
         }
         if (playerCoordinates.x < 0 || playerCoordinates.x >= width
                 || playerCoordinates.y < 0 || playerCoordinates.y >= height) {
@@ -25,10 +25,10 @@ public class Level {
             GridPoint2 coordinates = tree.getCoordinates();
             if (coordinates.x < 0 || coordinates.x >= width
                     || coordinates.y < 0 || coordinates.y >= height) {
-                throw new IllegalArgumentException("Tree must be inside the level");
+                throw new IllegalArgumentException("Trees must be inside the level");
             }
             if (tree.blocks(playerCoordinates)) {
-                throw new IllegalArgumentException("Player cannot start inside a tree");
+                throw new IllegalArgumentException("Player cannot start the game from inside a tree");
             }
         }
         this.width = width;

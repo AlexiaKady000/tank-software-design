@@ -19,7 +19,7 @@ public class RandomLevelLoader implements LevelLoader {
             throw new IllegalArgumentException("Invalid level dimensions");
         }
         if (treeCount < 0 || treeCount >= width * height) {
-            throw new IllegalArgumentException("Tree count must leave room for the player");
+            throw new IllegalArgumentException("Tree count must leave some room for the player");
         }
         this.width = width;
         this.height = height;
