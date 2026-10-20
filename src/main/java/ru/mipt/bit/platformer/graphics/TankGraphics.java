@@ -1,0 +1,49 @@
+package ru.mipt.bit.platformer.graphics;
+
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
+import ru.mipt.bit.platformer.model.Tank;
+import ru.mipt.bit.platformer.util.TileMovement;
+import static ru.mipt.bit.platformer.util.GdxGameUtils.createBoundingRectangle;
+import static ru.mipt.bit.platformer.util.GdxGameUtils.drawTextureRegionUnscaled;
+
+public class TankGraphics implements Renderable, Disposable {
+    private final Tank tank;
+    private final Texture texture;
+    private final TextureRegion graphics;
+    private final Rectangle rectangle;
+
+    public TankGraphics(Tank tank, String texturePath) {
+        this.tank = tank;
+        texture = new Texture(texturePath);
+        graphics = new TextureRegion(texture);
+        rectangle = createBoundingRectangle(graphics);
+    }
+
+    public void update(TileMovement tileMovement) {
+        tileMovement.moveRectangleBetweenTileCenters(
+                rectangle,
+                tank.getCoordinates(),
+                tank.getDestinationCoordinates(),
+                tank.getMovementProgress()
+        );
+    }
+
+    @Override
+    public void render(Batch batch) {
+        drawTextureRegionUnscaled(
+                batch,
+                graphics,
+                rectangle,
+                tank.getDirection().getRotation()
+        );
+    }
+
+    @Override
+    public void dispose() {
+        texture.dispose();
+    }
+}
