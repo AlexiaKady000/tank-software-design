@@ -17,10 +17,18 @@ public class FieldGraphics implements Disposable {
     private final MapRenderer renderer;
     private final TileMovement tileMovement;
 
-    public FieldGraphics(Batch batch, String mapPath, Interpolation interpolation) {
+    public FieldGraphics(Batch batch, String mapPath, Interpolation interpolation, int width, int height) {
         map = new TmxMapLoader().load(mapPath);
+        TiledMapTileLayer template = getSingleLayer(map);
+        groundLayer = new TiledMapTileLayer(width, height, template.getTileWidth(), template.getTileHeight());
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                groundLayer.setCell(x, y, template.getCell(x % template.getWidth(), y % template.getHeight()));
+            }
+        }
+        map.getLayers().remove(template);
+        map.getLayers().add(groundLayer);
         renderer = createSingleLayerMapRenderer(map, batch);
-        groundLayer = getSingleLayer(map);
         tileMovement = new TileMovement(groundLayer, interpolation);
     }
 
