@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import static com.badlogic.gdx.math.MathUtils.clamp;
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 
-public class Tank implements Updatable {
+public class Tank implements Updatable, Obstacle {
     private final float movementDuration;
 
     private final GridPoint2 coordinates;
@@ -46,6 +46,12 @@ public class Tank implements Updatable {
         if (isEqual(movementProgress, 1f)) {
             coordinates.set(destinationCoordinates);
         }
+    }
+
+    @Override
+    public boolean blocks(GridPoint2 coordinates) {
+        return this.coordinates.equals(coordinates)
+                || (isMoving() && destinationCoordinates.equals(coordinates));
     }
 
     public boolean isMoving() {

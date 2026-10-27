@@ -13,12 +13,17 @@ import ru.mipt.bit.platformer.graphics.FieldGraphics;
 import ru.mipt.bit.platformer.graphics.Renderable;
 import ru.mipt.bit.platformer.graphics.TankGraphics;
 import ru.mipt.bit.platformer.graphics.TreeGraphics;
+import ru.mipt.bit.platformer.input.ControlStrategy;
 import ru.mipt.bit.platformer.input.InputController;
+import ru.mipt.bit.platformer.input.KeyboardControlStrategy;
 import ru.mipt.bit.platformer.input.MoveInputHandler;
+import ru.mipt.bit.platformer.input.RandomControlStrategy;
 import ru.mipt.bit.platformer.level.FileLevelLoader;
 import ru.mipt.bit.platformer.level.Level;
 import ru.mipt.bit.platformer.level.LevelLoader;
 import ru.mipt.bit.platformer.level.RandomLevelLoader;
+import ru.mipt.bit.platformer.level.RandomTankGenerator;
+import ru.mipt.bit.platformer.level.TankGenerator;
 import ru.mipt.bit.platformer.model.Direction;
 import ru.mipt.bit.platformer.model.Field;
 import ru.mipt.bit.platformer.model.Tank;
@@ -38,6 +43,7 @@ import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 
 public class GameDesktopLauncher implements ApplicationListener {
     private final LevelLoader levelLoader;
+    private final TankGenerator tankGenerator;
     private Batch batch;
     private FieldGraphics fieldGraphics;
     private final List<Updatable> updatables = new ArrayList<>();
@@ -50,7 +56,12 @@ public class GameDesktopLauncher implements ApplicationListener {
     }
 
     public GameDesktopLauncher(LevelLoader levelLoader) {
+        this(levelLoader, new RandomTankGenerator(2, new Random()));
+    }
+
+    public GameDesktopLauncher(LevelLoader levelLoader, TankGenerator tankGenerator) {
         this.levelLoader = levelLoader;
+        this.tankGenerator = tankGenerator;
     }
 
     @Override
@@ -61,24 +72,17 @@ public class GameDesktopLauncher implements ApplicationListener {
         } catch (IOException e) {
             throw new UncheckedIOException("Cannot read level", e);
         }
+        Tank player = new Tank(level.getPlayerCoordinates(), 0.4f);
+        List<Tank> tanks = new ArrayList<>();
+        tanks.add(player);
+        tanks.addAll(tankGenerator.generate(level));
         batch = new SpriteBatch();
         Field field = new Field(level.getWidth(), level.getHeight());
-        Tank tank = new Tank(level.getPlayerCoordinates(), 0.4f);
         fieldGraphics = new FieldGraphics(batch, "level.tmx", Interpolation.smooth,
                 level.getWidth(), level.getHeight());
-        TankGraphics tankGraphics = new TankGraphics(tank, "images/tank_blue.png");
-        updatables.add(tank);
-        updatables.add(deltaTime -> tankGraphics.update(fieldGraphics.getTileMovement()));
-        renderables.add(tankGraphics);
         for (Tree tree : level.getTrees()) {
             field.addObstacle(tree);
-            TreeGraphics treeGraphics = new TreeGraphics(tree, fieldGraphics.getGroundLayer(), "images/greenTree.png");
-            renderables.add(treeGraphics);
-            disposables.add(treeGraphics);
         }
-        disposables.add(tankGraphics);
-        disposables.add(fieldGraphics);
-        disposables.add(batch);
         inputController = new InputController();
         Map<Integer, Direction> keyBindings = new LinkedHashMap<>();
         keyBindings.put(Input.Keys.UP, Direction.UP);
@@ -89,8 +93,25 @@ public class GameDesktopLauncher implements ApplicationListener {
         keyBindings.put(Input.Keys.S, Direction.DOWN);
         keyBindings.put(Input.Keys.RIGHT, Direction.RIGHT);
         keyBindings.put(Input.Keys.D, Direction.RIGHT);
-        inputController.addHandler(new MoveInputHandler(
-                direction -> tank.move(direction, field), Gdx.input::isKeyPressed, keyBindings));
+        ControlStrategy keyboard = new KeyboardControlStrategy(Gdx.input::isKeyPressed, keyBindings);
+        for (Tank tank : tanks) {
+            field.addObstacle(tank);
+            ControlStrategy strategy = tank == player
+                    ? keyboard : new RandomControlStrategy(new Random());
+            inputController.addHandler(new MoveInputHandler(tank, field, strategy));
+            TankGraphics tankGraphics = new TankGraphics(tank, "images/tank_blue.png");
+            updatables.add(tank);
+            updatables.add(deltaTime -> tankGraphics.update(fieldGraphics.getTileMovement()));
+            renderables.add(tankGraphics);
+            disposables.add(tankGraphics);
+        }
+        for (Tree tree : level.getTrees()) {
+            TreeGraphics treeGraphics = new TreeGraphics(tree, fieldGraphics.getGroundLayer(), "images/greenTree.png");
+            renderables.add(treeGraphics);
+            disposables.add(treeGraphics);
+        }
+        disposables.add(fieldGraphics);
+        disposables.add(batch);
     }
 
     @Override
