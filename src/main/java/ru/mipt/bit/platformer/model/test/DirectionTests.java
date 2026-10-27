@@ -28,4 +28,18 @@ class DirectionTest {
         assertEquals(-90f, Direction.DOWN.getRotation());
         assertEquals(0f, Direction.RIGHT.getRotation());
     }
+
+    @Test
+    void shouldMoveInEveryDirectionWithoutChangingInput() {
+        GridPoint2 initial = new GridPoint2(2, 2);
+        GridPoint2[] expected = {new GridPoint2(2, 3), new GridPoint2(1, 2),
+                new GridPoint2(2, 1), new GridPoint2(3, 2)};
+        Direction[] directions = Direction.values();
+        for (int i = 0; i < directions.length; i++) {
+            directions[i].getVector().set(100, 100);
+            assertEquals(expected[i], directions[i].move(initial));
+        }
+        assertEquals(new GridPoint2(2, 2), initial);
+    }
+
 }

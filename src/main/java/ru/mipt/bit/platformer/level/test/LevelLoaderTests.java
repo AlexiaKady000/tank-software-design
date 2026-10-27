@@ -100,4 +100,13 @@ class LevelLoaderTest {
         assertThrows(IllegalArgumentException.class,
                 () -> new RandomLevelLoader(Integer.MAX_VALUE, 2, 0, new Random()));
     }
+    @Test
+    void shouldRejectEmptyFirstRow() {
+        assertThrows(IllegalArgumentException.class, () -> read("\nX"));
+    }
+
+    @Test
+    void shouldRejectZeroHeight() {
+        assertThrows(IllegalArgumentException.class, () -> new RandomLevelLoader(1, 0, 0, new Random()));
+    }
 }

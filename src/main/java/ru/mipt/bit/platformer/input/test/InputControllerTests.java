@@ -17,4 +17,20 @@ class InputControllerTest {
 
         assertEquals(2, calls.get());
     }
+
+    @Test
+    void shouldHandleEmptyController() {
+        new InputController().handleInput();
+    }
+
+    @Test
+    void shouldPreserveHandlerOrder() {
+        InputController controller = new InputController();
+        StringBuilder calls = new StringBuilder();
+        controller.addHandler(() -> calls.append('1'));
+        controller.addHandler(() -> calls.append('2'));
+        controller.handleInput();
+        assertEquals("12", calls.toString());
+    }
+
 }
