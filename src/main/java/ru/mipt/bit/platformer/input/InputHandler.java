@@ -1,5 +1,11 @@
 package ru.mipt.bit.platformer.input;
 
+import ru.mipt.bit.platformer.command.Command;
+
 public interface InputHandler {
-    void handleInput();
+    Command getCommand();
+
+    default boolean isActive() {
+        return true;
+    }
 }

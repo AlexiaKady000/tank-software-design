@@ -2,8 +2,9 @@ package ru.mipt.bit.platformer.model.test;
 
 import com.badlogic.gdx.math.GridPoint2;
 import org.junit.jupiter.api.Test;
+import ru.mipt.bit.platformer.command.Command;
 import ru.mipt.bit.platformer.input.InputController;
-import ru.mipt.bit.platformer.input.MoveInputHandler;
+import ru.mipt.bit.platformer.input.TankInputHandler;
 import ru.mipt.bit.platformer.input.RandomControlStrategy;
 import ru.mipt.bit.platformer.level.Level;
 import ru.mipt.bit.platformer.level.RandomLevelLoader;
@@ -37,12 +38,14 @@ class TankSimulationTest {
             for (int i = 0; i < tanks.size(); i++) {
                 Tank tank = tanks.get(i);
                 field.addObstacle(tank);
-                controls.addHandler(new MoveInputHandler(tank, field,
-                        new RandomControlStrategy(new Random(seed * 100 + i))));
+                controls.addHandler(new TankInputHandler(tank, field,
+                        new RandomControlStrategy(new Random(seed * 100 + i), 0f)));
             }
             boolean moved = false;
             for (int tick = 0; tick < 1000; tick++) {
-                controls.handleInput();
+                for (Command command : controls.collectCommands()) {
+                    command.execute();
+                }
                 checkOccupancy(tanks, level);
                 for (Tank tank : tanks) {
                     moved |= tank.isMoving();
