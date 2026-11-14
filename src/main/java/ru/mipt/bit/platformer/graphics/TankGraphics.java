@@ -44,6 +44,10 @@ public class TankGraphics implements ObjectGraphics {
         );
     }
 
+    public Rectangle getBounds() {
+        return new Rectangle(rectangle);
+    }
+
     @Override
     public void dispose() {
         texture.dispose();
