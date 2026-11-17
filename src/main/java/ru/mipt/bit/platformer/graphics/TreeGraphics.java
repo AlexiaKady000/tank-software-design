@@ -11,6 +11,9 @@ import static ru.mipt.bit.platformer.util.GdxGameUtils.createBoundingRectangle;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.drawTextureRegionUnscaled;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.moveRectangleAtTileCenter;
 
+/**
+ * Type - class, role - outbound adapter component
+ */
 public class TreeGraphics implements ObjectGraphics {
     private final Texture texture;
     private final TextureRegion graphics;

@@ -9,6 +9,9 @@ import ru.mipt.bit.platformer.model.WorldContext;
 
 import java.util.Random;
 
+/**
+ * Type - class, role - AI policy; internal port implementation
+ */
 public class RandomControlStrategy implements ControlStrategy {
     private final Random random;
     private final float shootProbability;

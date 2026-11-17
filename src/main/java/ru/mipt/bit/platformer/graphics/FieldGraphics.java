@@ -11,6 +11,9 @@ import ru.mipt.bit.platformer.util.TileMovement;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.createSingleLayerMapRenderer;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.getSingleLayer;
 
+/**
+ * Type - class, role - outbound adapter component
+ */
 public class FieldGraphics implements Disposable {
     private final TiledMap map;
     private final TiledMapTileLayer groundLayer;

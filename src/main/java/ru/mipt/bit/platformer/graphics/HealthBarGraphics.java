@@ -10,6 +10,9 @@ import java.util.function.Supplier;
 
 import static com.badlogic.gdx.math.MathUtils.clamp;
 
+/**
+ * Type - class, role - decorator of an outbound adapter
+ */
 public class HealthBarGraphics implements ObjectGraphics {
     private static final float BAR_HEIGHT = 6f;
     private static final float BAR_MARGIN = 4f;

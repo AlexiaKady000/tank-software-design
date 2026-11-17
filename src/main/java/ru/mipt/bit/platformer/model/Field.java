@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Type - class, role - aggregate root
+ */
 public class Field implements WorldContext, ObservableLevel {
     private static final float MIN_TIME_STEP = 0.000001f;
 

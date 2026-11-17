@@ -48,6 +48,9 @@ import java.util.Random;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 
+/**
+ * Type - class, role - composition root and inbound adapter; mixed responsibilities
+ */
 public class GameDesktopLauncher implements ApplicationListener {
     private final LevelLoader levelLoader;
     private final TankGenerator tankGenerator;

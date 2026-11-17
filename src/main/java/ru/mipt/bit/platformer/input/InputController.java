@@ -5,6 +5,9 @@ import ru.mipt.bit.platformer.command.Command;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Type - class, role - application service
+ */
 public class InputController {
     private final List<InputHandler> handlers = new ArrayList<>();
 

@@ -1,5 +1,8 @@
 package ru.mipt.bit.platformer.graphics;
 
+/**
+ * Type - class, role - presentation state
+ */
 public class HealthBarVisibility {
     private boolean visible;
 

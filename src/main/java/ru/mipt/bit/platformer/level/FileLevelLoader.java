@@ -10,6 +10,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Type - class, role - outbound adapter
+ */
 public class FileLevelLoader implements LevelLoader {
     private final Path path;
 
