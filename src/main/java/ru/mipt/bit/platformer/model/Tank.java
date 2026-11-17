@@ -5,10 +5,13 @@ import static com.badlogic.gdx.math.MathUtils.clamp;
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 
 public class Tank implements Updatable, Obstacle, Damageable {
+    private static final int MAX_HEALTH = 100;
+    private static final int BULLET_DAMAGE = 10;
+
     private final float movementDuration;
     private final float shotInterval;
     private final float bulletMovementDuration;
-    private int health = 3;
+    private int health = MAX_HEALTH;
     private float shotCooldown;
 
     private final GridPoint2 coordinates;
@@ -57,7 +60,7 @@ public class Tank implements Updatable, Obstacle, Damageable {
             return;
         }
         shotCooldown = shotInterval;
-        Bullet bullet = new Bullet(direction.move(coordinates), direction, this, bulletMovementDuration, 1);
+        Bullet bullet = new Bullet(direction.move(coordinates), direction, this, bulletMovementDuration, BULLET_DAMAGE);
         world.addObject(bullet);
         if (!world.isInsideField(bullet.getCoordinates())) {
             world.removeObject(bullet);
@@ -77,8 +80,14 @@ public class Tank implements Updatable, Obstacle, Damageable {
         return health > 0;
     }
 
+    @Override
     public int getHealth() {
         return health;
+    }
+
+    @Override
+    public int getMaxHealth() {
+        return MAX_HEALTH;
     }
 
     @Override

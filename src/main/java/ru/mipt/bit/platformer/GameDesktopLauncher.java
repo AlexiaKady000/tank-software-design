@@ -11,9 +11,12 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Interpolation;
 import ru.mipt.bit.platformer.command.Command;
+import ru.mipt.bit.platformer.command.ToggleHealthBarsCommand;
 import ru.mipt.bit.platformer.graphics.BulletGraphics;
 import ru.mipt.bit.platformer.graphics.FieldGraphics;
 import ru.mipt.bit.platformer.graphics.GraphicsFactory;
+import ru.mipt.bit.platformer.graphics.HealthBarGraphics;
+import ru.mipt.bit.platformer.graphics.HealthBarVisibility;
 import ru.mipt.bit.platformer.graphics.TankGraphics;
 import ru.mipt.bit.platformer.graphics.TreeGraphics;
 import ru.mipt.bit.platformer.graphics.WorldGraphics;
@@ -53,6 +56,8 @@ public class GameDesktopLauncher implements ApplicationListener {
     private FieldGraphics fieldGraphics;
     private WorldGraphics worldGraphics;
     private Texture bulletTexture;
+    private Texture healthBarTexture;
+    private final HealthBarVisibility healthBars = new HealthBarVisibility();
     private InputController inputController;
 
     public GameDesktopLauncher() {
@@ -88,10 +93,16 @@ public class GameDesktopLauncher implements ApplicationListener {
         pixel.setColor(1f, 0.8f, 0f, 1f);
         pixel.fill();
         bulletTexture = new Texture(pixel);
+        pixel.setColor(1f, 1f, 1f, 1f);
+        pixel.fill();
+        healthBarTexture = new Texture(pixel);
         pixel.dispose();
         GraphicsFactory factory = new GraphicsFactory();
-        factory.register(Tank.class, tank -> new TankGraphics(tank, "images/tank_blue.png",
-                fieldGraphics.getTileMovement()));
+        factory.register(Tank.class, tank -> {
+            TankGraphics graphics = new TankGraphics(tank, "images/tank_blue.png", fieldGraphics.getTileMovement());
+            return new HealthBarGraphics(graphics, tank, graphics::getBounds,
+                    healthBars::isVisible, healthBarTexture);
+        });
         factory.register(Tree.class, tree -> new TreeGraphics(tree, fieldGraphics.getGroundLayer(),
                 "images/greenTree.png"));
         factory.register(Bullet.class, bullet -> new BulletGraphics(bullet,
@@ -99,6 +110,9 @@ public class GameDesktopLauncher implements ApplicationListener {
         worldGraphics = new WorldGraphics(world, factory);
 
         inputController = new InputController();
+        Command toggleHealthBars = new ToggleHealthBarsCommand(healthBars::toggle);
+        inputController.addHandler(() -> Gdx.input.isKeyJustPressed(Input.Keys.L)
+                ? toggleHealthBars : Command.NONE);
         Map<Integer, Direction> keyBindings = new LinkedHashMap<>();
         keyBindings.put(Input.Keys.UP, Direction.UP);
         keyBindings.put(Input.Keys.W, Direction.UP);
@@ -157,6 +171,7 @@ public class GameDesktopLauncher implements ApplicationListener {
     public void dispose() {
         worldGraphics.dispose();
         bulletTexture.dispose();
+        healthBarTexture.dispose();
         fieldGraphics.dispose();
         batch.dispose();
     }

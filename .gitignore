@@ -15,3 +15,5 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 .idea
+
+/src/main/java/ru/mipt/bit/platformer/**/test/
