@@ -4,6 +4,9 @@ import ru.mipt.bit.platformer.command.Command;
 import ru.mipt.bit.platformer.model.WorldContext;
 import ru.mipt.bit.platformer.model.Tank;
 
+/**
+ * Type - interface, role - outbound port
+ */
 public interface ControlStrategy {
     Command getCommand(Tank tank, WorldContext field);
 }

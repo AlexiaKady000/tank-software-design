@@ -8,6 +8,9 @@ import ru.mipt.bit.platformer.model.Bullet;
 
 import static ru.mipt.bit.platformer.util.GdxGameUtils.moveRectangleAtTileCenter;
 
+/**
+ * Type - class, role - outbound adapter component
+ */
 public class BulletGraphics implements ObjectGraphics {
     private final Bullet bullet;
     private final TiledMapTileLayer tileLayer;

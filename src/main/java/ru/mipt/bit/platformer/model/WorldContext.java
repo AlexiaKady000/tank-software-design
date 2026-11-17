@@ -3,6 +3,9 @@ package ru.mipt.bit.platformer.model;
 import com.badlogic.gdx.math.GridPoint2;
 import java.util.List;
 
+/**
+ * Type - interface, role - internal aggregate interface
+ */
 public interface WorldContext extends MovementField {
     void addObject(GameObject object);
     void removeObject(GameObject object);

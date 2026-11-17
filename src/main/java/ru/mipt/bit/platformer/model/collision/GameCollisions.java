@@ -4,6 +4,9 @@ import ru.mipt.bit.platformer.model.Bullet;
 import ru.mipt.bit.platformer.model.Damageable;
 import ru.mipt.bit.platformer.model.GameObject;
 
+/**
+ * Type - class, role - domain rules factory
+ */
 public final class GameCollisions {
     private GameCollisions() {
     }

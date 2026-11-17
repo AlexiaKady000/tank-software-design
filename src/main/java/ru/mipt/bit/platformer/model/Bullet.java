@@ -2,6 +2,9 @@ package ru.mipt.bit.platformer.model;
 
 import com.badlogic.gdx.math.GridPoint2;
 
+/**
+ * Type - class, role - entity
+ */
 public class Bullet implements GameObject {
     private static final float TIME_EPSILON = 0.000001f;
 

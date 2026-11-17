@@ -4,6 +4,9 @@ import ru.mipt.bit.platformer.model.Direction;
 import ru.mipt.bit.platformer.model.WorldContext;
 import ru.mipt.bit.platformer.model.Tank;
 
+/**
+ * Type - class, role - use case
+ */
 public class MoveCommand implements Command {
     private final Tank tank;
     private final Direction direction;

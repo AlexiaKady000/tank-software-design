@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Type - class, role - internal port implementation
+ */
 public class RandomLevelLoader implements LevelLoader {
     private final int width;
     private final int height;

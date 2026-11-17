@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.function.IntPredicate;
 import java.util.function.BooleanSupplier;
 
+/**
+ * Type - class, role - outbound adapter (polled keyboard input)
+ */
 public class KeyboardControlStrategy implements ControlStrategy {
     private final IntPredicate isKeyPressed;
     private final BooleanSupplier isShootPressed;

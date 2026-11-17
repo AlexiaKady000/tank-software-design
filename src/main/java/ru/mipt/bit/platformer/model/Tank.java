@@ -1,9 +1,15 @@
 package ru.mipt.bit.platformer.model;
 
 import com.badlogic.gdx.math.GridPoint2;
+
+import java.util.Objects;
+
 import static com.badlogic.gdx.math.MathUtils.clamp;
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 
+/**
+ * Type - class, role - entity
+ */
 public class Tank implements Updatable, Obstacle, Damageable {
     private static final int MAX_HEALTH = 100;
     private static final int BULLET_DAMAGE = 10;
@@ -12,6 +18,7 @@ public class Tank implements Updatable, Obstacle, Damageable {
     private final float shotInterval;
     private final float bulletMovementDuration;
     private int health = MAX_HEALTH;
+    private TankState state = HealthTankState.LIGHT;
     private float shotCooldown;
 
     private final GridPoint2 coordinates;
@@ -56,7 +63,7 @@ public class Tank implements Updatable, Obstacle, Damageable {
     }
 
     public void shoot(WorldContext world) {
-        if (!isAlive() || !world.contains(this) || shotCooldown > 0f) {
+        if (!isAlive() || !state.canShoot() || !world.contains(this) || shotCooldown > 0f) {
             return;
         }
         shotCooldown = shotInterval;
@@ -73,6 +80,22 @@ public class Tank implements Updatable, Obstacle, Damageable {
             throw new IllegalArgumentException("Damage must not be negative");
         }
         health = Math.max(0, health - amount);
+        setState(state.onHealthChanged(this));
+    }
+
+    public TankState getState() {
+        return state;
+    }
+
+    public void setState(TankState state) {
+        Objects.requireNonNull(state, "Tank state must not be null");
+        float movementSpeed = state.getMovementSpeedMultiplier();
+        float fireRate = state.getFireRateMultiplier();
+        if (!Float.isFinite(movementSpeed) || movementSpeed <= 0f
+                || !Float.isFinite(fireRate) || fireRate <= 0f) {
+            throw new IllegalArgumentException("State speed and fire rate must be positive and finite");
+        }
+        this.state = state;
     }
 
     @Override
@@ -97,19 +120,23 @@ public class Tank implements Updatable, Obstacle, Damageable {
 
     @Override
     public float timeToNextEvent() {
-        return isMoving() ? (1f - movementProgress) * movementDuration : Float.POSITIVE_INFINITY;
+        if (!isMoving()) {
+            return Float.POSITIVE_INFINITY;
+        }
+        return (1f - movementProgress) * movementDuration / state.getMovementSpeedMultiplier();
     }
 
     @Override
     public void update(float deltaTime) {
-        shotCooldown = Math.max(0f, shotCooldown - deltaTime);
+        shotCooldown = Math.max(0f, shotCooldown - deltaTime * state.getFireRateMultiplier());
         if (isEqual(shotCooldown, 0f)) {
             shotCooldown = 0f;
         }
         if (!isAlive() || !isMoving()) {
             return;
         }
-        movementProgress = clamp(movementProgress + deltaTime / movementDuration, 0f, 1f);
+        float progressChange = deltaTime * state.getMovementSpeedMultiplier() / movementDuration;
+        movementProgress = clamp(movementProgress + progressChange, 0f, 1f);
         if (isEqual(movementProgress, 1f)) {
             coordinates.set(destinationCoordinates);
         }

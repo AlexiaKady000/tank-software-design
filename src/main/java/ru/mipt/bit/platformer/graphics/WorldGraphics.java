@@ -9,6 +9,9 @@ import ru.mipt.bit.platformer.model.ObservableLevel;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Type - class, role - outbound adapter
+ */
 public final class WorldGraphics implements LevelObserver, Renderable, Disposable {
     private final ObservableLevel level;
     private final GraphicsFactory factory;

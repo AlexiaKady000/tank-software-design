@@ -10,6 +10,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Type - class, role - domain service and factory
+ */
 public class RandomTankGenerator implements TankGenerator {
     private final int tankCount;
     private final Random random;

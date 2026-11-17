@@ -4,6 +4,9 @@ import ru.mipt.bit.platformer.command.Command;
 import ru.mipt.bit.platformer.model.Tank;
 import ru.mipt.bit.platformer.model.WorldContext;
 
+/**
+ * Type - class, role - application service
+ */
 public class TankInputHandler implements InputHandler {
     private final Tank tank;
     private final WorldContext world;

@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Type - class, role - level definition
+ */
 public class Level {
     private final int width;
     private final int height;

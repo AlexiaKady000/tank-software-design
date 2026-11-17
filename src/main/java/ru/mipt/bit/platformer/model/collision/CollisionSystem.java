@@ -7,7 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiPredicate;
 
+/**
+ * Type - class, role - domain service
+ */
 public class CollisionSystem {
+    /**
+     * Type - interface, role - private rule interface
+     */
     private interface Rule {
         boolean apply(GameObject first, GameObject second, WorldContext world);
     }

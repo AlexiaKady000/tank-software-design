@@ -6,6 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Type - class, role - adapter factory
+ */
 public class GraphicsFactory {
     private final Map<Class<?>, Function<GameObject, ObjectGraphics>> factories = new LinkedHashMap<>();
 
